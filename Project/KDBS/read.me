@@ -1,0 +1,171 @@
+KDBS — Core Project Structure
+
+---
+
+OVERVIEW
+
+KDBS is organized around a modular and versioned layout designed for:
+
+* Clear directory roles
+* Clean separation of code and artifacts
+* Centralized header usage
+* Versioned, reproducible builds
+
+Each build produces a self-contained directory with its own
+executable and object files.
+
+---
+
+DIRECTORY LAYOUT
+
+.
+├── ass-K      → ASSets
+├── lib-K      → LIBraries
+│   └── req    → REQuired (custom headers)
+├── src-K      → SouRCe
+│   └── mod    → MODules (linkable source files)
+├── out-K      → OUTput (versioned builds)
+├── Makefile
+└── read.me
+
+---
+
+DIRECTORY PURPOSE
+
+ass-K/
+    Project assets (data files, configs, resources, etc.)
+
+src-K/
+    Main source directory
+
+    main.c
+        Entry point of the program
+
+    mod/
+        Modular source files (*/*.c)
+        These are compiled and linked into the final executable
+
+lib-K/
+    Project headers
+
+    kdbs.h
+        Central header
+
+    req/
+        Custom required headers
+        All internal headers live here
+
+out-K/
+    Build output directory
+
+    Each build creates:
+
+        vN.N.N/
+            KDBS        → final executable
+            lnk/        → object files
+                main.o
+                mod/*.o
+
+---
+
+HEADER DESIGN
+
+The project uses a centralized header model.
+
+    lib-K/kdbs.h
+
+This file includes all headers from:
+
+    lib-K/req/*.h
+
+Usage:
+
+    #include <kdbs.h>
+
+No need to include individual headers from req/.
+This keeps source files clean and consistent.
+
+---
+
+BUILD SYSTEM
+
+Three commands are provided:
+
+    make        → release build
+    make debug  → debug build
+    make clean  → remove latest build
+
+Each build creates a new versioned directory:
+
+    out-K/vN.N.N/
+
+Object files are preserved inside:
+
+    out-K/vN.N.N/lnk/
+
+No files are deleted after a successful build.
+
+---
+
+VERSIONING
+
+Builds are automatically versioned.
+
+Behavior:
+
+* Detects latest version in out-K/
+* Increments patch version with carry:
+    0.0.9 → 0.1.0
+    0.9.9 → 1.0.0
+* Starts at 0.0.0 if none exist
+
+Each version is independent and self-contained.
+
+---
+
+RUNNING
+
+Run a specific build:
+
+    ./out-K/vN.N.N/KDBS
+
+---
+
+CLEANING
+
+Remove only the latest version:
+
+    make clean
+
+This deletes:
+
+    out-K/vN.N.N/
+
+Older versions remain untouched.
+
+---
+
+NOTES
+
+* Each build produces a new versioned directory
+* Object files are preserved per version
+* No incremental builds across versions (intentional isolation)
+* Release builds are machine-specific (-march=native)
+
+Requirements:
+
+* gcc
+* make
+* Unix tools (find, sed, sort)
+
+---
+
+DESIGN PRINCIPLES
+
+* Clear naming convention (K-suffixed directories)
+* Modular compilation structure
+* Centralized header inclusion
+* Version-isolated builds
+* Predictable and reproducible outputs
+
+---
